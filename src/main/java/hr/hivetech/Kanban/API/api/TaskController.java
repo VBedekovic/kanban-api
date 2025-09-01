@@ -3,10 +3,16 @@ package hr.hivetech.Kanban.API.api;
 import hr.hivetech.Kanban.API.task.Task;
 import hr.hivetech.Kanban.API.task.TaskService;
 import hr.hivetech.Kanban.API.task.enums.TaskStatus;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
+
+
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -17,7 +23,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public Page<Task> getTasksPage(
+    public ResponseEntity<Page<Task>> getTasksPage(
             @RequestParam(required = true) TaskStatus status,
             @RequestParam(required = true) int page,
             @RequestParam(required = true) int size,
@@ -25,11 +31,39 @@ public class TaskController {
     ) {
         Sort sortObj = Sort.by(sort);
         PageRequest pageRequest = PageRequest.of(page, size, sortObj);
-        return taskService.getTasksPage(status, pageRequest);
+        Page<Task> tasks = taskService.getTasksPage(status, pageRequest);
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("({id}")
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        return taskService.getTaskById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.uploadTask(task);
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        Task savedTask = taskService.uploadTask(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+        boolean deleted = taskService.deleteTask(id);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateWholeTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+        try {
+            Task task = taskService.updateWholeTask(id, updatedTask);
+            return ResponseEntity.ok(task);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return ResponseEntity.status(409).build();
+        }
+    }
+
 }

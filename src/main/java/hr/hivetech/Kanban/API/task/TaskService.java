@@ -1,9 +1,12 @@
 package hr.hivetech.Kanban.API.task;
 
 import hr.hivetech.Kanban.API.task.enums.TaskStatus;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 @Service
@@ -34,6 +37,12 @@ public class TaskService {
         }
         taskRepository.deleteById(id);
         return true;
+    }
+
+    @Transactional
+    public Task updateWholeTask(Long id, Task updatedTask) {
+        updatedTask.setId(id);
+        return taskRepository.save(updatedTask);
     }
 
 }

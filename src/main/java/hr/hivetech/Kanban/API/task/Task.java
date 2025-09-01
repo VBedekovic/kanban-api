@@ -24,6 +24,9 @@ public class Task {
     @Column(nullable = false)
     private TaskPriroirty priority;
 
+    @Version
+    private Long version;
+
     public Long getId() {
         return id;
     }
@@ -58,4 +61,12 @@ public class Task {
     public void setPriority(TaskPriroirty priority) {
         this.priority = priority;
     }
+
+    public Long getVersion() {
+        return version;
+    }
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
 }
