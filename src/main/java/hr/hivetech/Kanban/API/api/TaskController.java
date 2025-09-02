@@ -8,11 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
-
-
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -64,6 +63,24 @@ public class TaskController {
         } catch (ObjectOptimisticLockingFailureException e) {
             return ResponseEntity.status(409).build();
         }
+    }
+
+    @PatchMapping(
+            value = "/{id}",
+            consumes = "application/merge-patch+json",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Task> patchTask(
+            @PathVariable Long id,
+            @RequestBody String mergePatchJson
+    ) throws Exception {
+        try {
+            Task patchedTask = taskService.patchTask(id, mergePatchJson);
+            return ResponseEntity.ok(patchedTask);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
 }
