@@ -3,6 +3,7 @@ package hr.hivetech.Kanban.API.api;
 import hr.hivetech.Kanban.API.task.Task;
 import hr.hivetech.Kanban.API.task.TaskService;
 import hr.hivetech.Kanban.API.task.enums.TaskStatus;
+import hr.hivetech.Kanban.API.ws.PublishTaskEvent;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -42,18 +45,21 @@ public class TaskController {
     }
 
     @PostMapping
+    @PublishTaskEvent(action = "CREATE")
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         Task savedTask = taskService.uploadTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    @PublishTaskEvent(action = "DELETE")
+    public ResponseEntity<Map<String, Long>> deleteTask(@PathVariable Long id) {
         boolean deleted = taskService.deleteTask(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return deleted ? ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("id", id)) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
+    @PublishTaskEvent(action = "UPDATE")
     public ResponseEntity<Task> updateWholeTask(@PathVariable Long id, @RequestBody Task updatedTask) {
         try {
             Task task = taskService.updateWholeTask(id, updatedTask);
@@ -70,6 +76,7 @@ public class TaskController {
             consumes = "application/merge-patch+json",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @PublishTaskEvent(action = "UPDATE")
     public ResponseEntity<Task> patchTask(
             @PathVariable Long id,
             @RequestBody String mergePatchJson
