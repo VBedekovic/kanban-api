@@ -5,6 +5,7 @@ import hr.hivetech.Kanban.API.task.TaskService;
 import hr.hivetech.Kanban.API.task.enums.TaskStatus;
 import hr.hivetech.Kanban.API.ws.PublishTaskEvent;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -46,7 +47,7 @@ public class TaskController {
 
     @PostMapping
     @PublishTaskEvent(action = "CREATE")
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    public ResponseEntity<Task> createTask(@RequestBody @Valid Task task) {
         Task savedTask = taskService.uploadTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
@@ -60,7 +61,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     @PublishTaskEvent(action = "UPDATE")
-    public ResponseEntity<Task> updateWholeTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+    public ResponseEntity<Task> updateWholeTask(@PathVariable Long id, @Valid @RequestBody Task updatedTask) {
         try {
             Task task = taskService.updateWholeTask(id, updatedTask);
             return ResponseEntity.ok(task);
@@ -79,7 +80,7 @@ public class TaskController {
     @PublishTaskEvent(action = "UPDATE")
     public ResponseEntity<Task> patchTask(
             @PathVariable Long id,
-            @RequestBody String mergePatchJson
+            @Valid @RequestBody String mergePatchJson
     ) throws Exception {
         try {
             Task patchedTask = taskService.patchTask(id, mergePatchJson);

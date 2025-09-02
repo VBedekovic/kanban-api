@@ -26,7 +26,7 @@ public class TaskService {
         if (status == null) {
             return taskRepository.findAll(pageable);
         }
-        return taskRepository.findByStatus(status, pageable);
+        return taskRepository.findByStatus(status.toString(), pageable);
     }
 
     public Optional<Task> getTaskById(Long id) {
