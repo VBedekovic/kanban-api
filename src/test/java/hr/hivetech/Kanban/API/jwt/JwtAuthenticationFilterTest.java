@@ -36,7 +36,7 @@ class JwtAuthenticationFilterTest {
         MockitoAnnotations.openMocks(this);
         filter = new JwtAuthenticationFilter();
         try {
-            var field = JwtAuthenticationFilter.class.getDeclaredField("jwtUtil");
+            var field = JwtAuthenticationFilter.class.getDeclaredField("jwtService");
             field.setAccessible(true);
             field.set(filter, jwtService);
         } catch (Exception e) {

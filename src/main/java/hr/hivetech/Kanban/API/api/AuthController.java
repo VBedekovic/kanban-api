@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
     private final ApiUserService userService;
-    private final JwtService jwtUtil;
+    private final JwtService jwtService;
 
-    public AuthController(ApiUserService userService, JwtService jwtUtil) {
+    public AuthController(ApiUserService userService, JwtService jwtService) {
         this.userService = userService;
-        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
     }
 
     @PostMapping
@@ -23,7 +23,7 @@ public class AuthController {
         if (user == null) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtService.generateToken(user.getUsername());
         return ResponseEntity.ok(new JwtResponse(token));
     }
 

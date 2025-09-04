@@ -18,7 +18,7 @@ class AuthControllerTest {
     private ApiUserService userService;
 
     @Mock
-    private JwtService jwtUtil;
+    private JwtService jwtService;
 
     @InjectMocks
     private AuthController controller;
@@ -34,7 +34,7 @@ class AuthControllerTest {
         user.setUsername("user");
         AuthController.LoginRequest req = new AuthController.LoginRequest("user", "pw");
         when(userService.authenticate("user", "pw")).thenReturn(user);
-        when(jwtUtil.generateToken("user")).thenReturn("token123");
+        when(jwtService.generateToken("user")).thenReturn("token123");
 
         ResponseEntity<?> response = controller.authenticate(req);
 
