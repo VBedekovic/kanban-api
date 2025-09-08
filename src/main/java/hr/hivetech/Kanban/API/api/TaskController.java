@@ -27,7 +27,7 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<Page<Task>> getTasksPage(
-            @RequestParam(required = true) TaskStatus status,
+            @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = true) int page,
             @RequestParam(required = true) int size,
             @RequestParam(defaultValue = "id") String[] sort
