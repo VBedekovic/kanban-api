@@ -16,7 +16,7 @@ This project provides a backend API for managing Kanban tasks, including authent
 
 2. **Start the application with Docker Compose:**
    ```sh
-   docker-compose up --build
+   sudo docker compose up --build
    ```
 
    This will start both the PostgreSQL database and the Kanban API server.
