@@ -8,7 +8,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +30,8 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<Page<Task>> getTasksPage(
             @RequestParam(required = false) TaskStatus status,
-            @RequestParam(required = true) int page,
-            @RequestParam(required = true) int size,
-            @RequestParam(defaultValue = "id") String[] sort
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageRequest
     ) {
-        Sort sortObj = Sort.by(sort);
-        PageRequest pageRequest = PageRequest.of(page, size, sortObj);
         Page<Task> tasks = taskService.getTasksPage(status, pageRequest);
         return ResponseEntity.ok(tasks);
     }

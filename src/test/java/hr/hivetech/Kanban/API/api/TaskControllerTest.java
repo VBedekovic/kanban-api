@@ -33,9 +33,10 @@ class TaskControllerTest {
     @Test
     void getTasksPage_returnsPage() {
         Page<Task> page = new PageImpl<>(List.of(new Task()));
-        when(taskService.getTasksPage(TaskStatus.TO_DO, PageRequest.of(0, 10, Sort.by("id")))).thenReturn(page);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id"));
+        when(taskService.getTasksPage(TaskStatus.TO_DO, pageable)).thenReturn(page);
 
-        ResponseEntity<Page<Task>> response = controller.getTasksPage(TaskStatus.TO_DO, 0, 10, new String[]{"id"});
+        ResponseEntity<Page<Task>> response = controller.getTasksPage(TaskStatus.TO_DO, pageable);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(page, response.getBody());
